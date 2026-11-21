@@ -1,0 +1,28 @@
+# Bytecode Python
+__pycache__/
+*.py[cod]
+
+# Environnements virtuels
+.venv/
+venv/
+env/
+
+# Tests et couverture
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Caches d'outils (Ruff, mypy)
+.ruff_cache/
+.mypy_cache/
+
+# Packaging
+build/
+dist/
+*.egg-info/
+
+# Éditeurs et système
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
