@@ -7,7 +7,8 @@ Ce document résume les conventions de style à respecter dans le projet, basée
 1. [Conventions de nommage](#1-conventions-de-nommage)
 2. [Mise en forme et structure](#2-mise-en-forme-et-structure)
 3. [Bonnes pratiques courantes](#3-bonnes-pratiques-courantes)
-4. [Pour approfondir](#4-pour-approfondir)
+4. [Tests](#4-tests)
+5. [Pour approfondir](#5-pour-approfondir)
 
 ---
 
@@ -105,11 +106,11 @@ def diviser(a: float, b: float) -> float:
 
 Utiliser les opérateurs `and`, `or` et, pour le « ou exclusif » (xor), l'opérateur `^`.
 
-| Opération | Opérateur | Exemple |
-| --- | --- | --- |
-| ET | `and` | `a and b` |
-| OU | `or` | `a or b` |
-| OU exclusif | `^` | `a ^ b` |
+| Opération  | Opérateur | Exemple     |
+| ----------- | ---------- | ----------- |
+| ET          | `and`    | `a and b` |
+| OU          | `or`     | `a or b`  |
+| OU exclusif | `^`      | `a ^ b`   |
 
 > `xor` n'existe pas en Python : il n'y a pas de mot-clé de ce nom. Pour deux booléens, `a ^ b` (ou `a != b`) donne le résultat attendu.
 
@@ -119,7 +120,54 @@ Appliquer ces règles automatiquement avec un formateur ou un *linter* : **Ruff*
 
 ---
 
-## 4. Pour approfondir
+## 4. Tests
+
+### Itérer sur un dictionnaire
+
+`.items()` permet de récupérer à la fois les clés et les valeurs.
+
+```python
+for target_distance, response in test_distance_dict.items():
+    ...
+```
+
+### Séries de valeurs de test
+
+Quand une même logique de test est appliquée à plusieurs valeurs, utiliser `@pytest.mark.parametrize` plutôt qu'une boucle `for` dans le test. Chaque valeur devient un test indépendant : un échec n'interrompt pas les autres et pytest indique précisément la valeur fautive.
+
+Regrouper les cas dans un dictionnaire `{entrée: résultat attendu}` et le passer à `parametrize` via `.items()`. Une réponse de type `str` désigne le message d'une exception attendue.
+
+```python
+test_distance_dict = {-1: "La distance ne peut pas être négative", 0: False, 1: True, 200: True, 200.1: False}
+
+
+@pytest.mark.parametrize("target_distance, response", test_distance_dict.items())
+def test_target_distance_detection(target_distance, response):
+    if isinstance(response, str):
+        with pytest.raises(ValueError, match=response):
+            is_target_detectable(target_distance)
+    else:
+        assert is_target_detectable(target_distance) == response
+```
+
+### Valeurs limites
+
+Tester les valeurs situées juste en dessous, sur et juste au-dessus de chaque borne. Pour une portée radar de 1 à 200 m :
+
+| Distance | Résultat attendu |
+| -------- | ---------------- |
+| 0,5 m    | `False`          |
+| 199,9 m  | `True`           |
+| 200 m    | `True`           |
+| 200,1 m  | `False`          |
+
+### Nom des fonctions de test
+
+Chaque fonction de test doit avoir un nom unique dans son module : une seconde définition du même nom écrase la première, qui n'est alors jamais exécutée.
+
+---
+
+## 5. Pour approfondir
 
 - [PEP 8 – Style Guide for Python Code](https://peps.python.org/pep-0008/)
 - [Tutoriel PEP 8 (DataCamp)](https://www.datacamp.com/fr/tutorial/pep8-tutorial-python-code)
