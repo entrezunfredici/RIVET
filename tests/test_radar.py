@@ -36,6 +36,11 @@ test_targets_list = [
         "count": 4
     }),
     ([10, -1, 50], "La distance ne peut pas être négative"),
+    ([0, 0.5, 0.5, 1, 1, 50, 50, 199.9, 200, 200.1],{
+        "detected": [1, 1, 50, 50, 199.9, 200],
+        "not_detected": [0, 0.5, 0.5, 200.1],
+        "count": 6
+    }),
 ]
 
 @pytest.mark.parametrize("target_distance_list, response", test_targets_list)
@@ -44,4 +49,12 @@ def test_analyze_targets(target_distance_list, response):
         with pytest.raises(ValueError, match=response):
             analyze_targets(target_distance_list)
     else:
-        assert analyze_targets(target_distance_list)==response
+        assert analyze_targets(target_distance_list) == response
+
+test_targets_safe_list = [[0, 0.5, 0.5, 1, 1, 50, 50, 199.9, 200, 200.1]]
+
+@pytest.mark.parametrize("target_distance_list", test_targets_safe_list)
+def test_safe_list(target_distance_list):
+    target_distance_copy_list=target_distance_list.copy()
+    analyze_targets(target_distance_list)
+    assert target_distance_list == target_distance_copy_list

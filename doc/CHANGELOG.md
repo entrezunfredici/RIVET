@@ -2,10 +2,19 @@
 
 ## Sommaire
 
-1. [Mise en place de l'environnement](#1-mise-en-place-de-lenvironnement)
-2. [Fonction `is_target_detectable`](#2-fonction-is_target_detectable)
-3. [Fonction `analyze_targets`](#3-fonction-analyze_targets)
-4. [Développement en TDD de `analyze_targets`](#4-développement-en-tdd-de-analyze_targets)
+- [Changelog](#changelog)
+  - [Sommaire](#sommaire)
+  - [1. Mise en place de l'environnement](#1-mise-en-place-de-lenvironnement)
+  - [2. Fonction `is_target_detectable`](#2-fonction-is_target_detectable)
+    - [User story](#user-story)
+    - [Exigences supplémentaires](#exigences-supplémentaires)
+    - [Données d'entrée](#données-dentrée)
+    - [Algorithme](#algorithme)
+  - [3. Fonction `analyze_targets`](#3-fonction-analyze_targets)
+    - [User story](#user-story-1)
+    - [Contraintes supplémentaires](#contraintes-supplémentaires)
+    - [Exemple de résultat attendu](#exemple-de-résultat-attendu)
+  - [4. Développement en TDD de `analyze_targets`](#4-développement-en-tdd-de-analyze_targets)
 
 ---
 
@@ -35,11 +44,11 @@ Détecter si une cible est détectable par le radar.
 
 ### Données d'entrée
 
-| Variable                 | Description                               |
-| ------------------------ | ----------------------------------------- |
-| `target_distance`        | Distance séparant la cible et le radar    |
-| `max_detection_distance` | Distance de détection maximale            |
-| `min_detection_distance` | Distance de détection minimale            |
+| Variable                   | Description                             |
+| -------------------------- | --------------------------------------- |
+| `target_distance`        | Distance séparant la cible et le radar |
+| `max_detection_distance` | Distance de détection maximale         |
+| `min_detection_distance` | Distance de détection minimale         |
 
 ### Algorithme
 
@@ -95,13 +104,18 @@ Pour les distances `[0, 10, 50, 250, 200]`, la fonction doit retourner :
 
 ## 4. Développement en TDD de `analyze_targets`
 
-| Étape | Action                                                                                          | Résultat                                       |
-| ----- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| 1     | Rédaction du test unitaire                                                                      |                                                |
-| 2     | Lancement du test sans fonction                                                                 | Échec                                          |
-| 3     | Scénario « liste de cibles vide » : création de la fonction à vide (`pass`)                    | Échec                                          |
-| 4     | Ajout d'un retour avec valeurs à zéro                                                           | Réussite                                       |
-| 5     | Ajout d'un scénario avec des valeurs                                                            | Premier scénario réussi, second scénario échoué |
-| 6     | Amélioration de la fonction : détection via `is_target_detectable`                              | Les deux scénarios réussis                     |
-| 7     | Ajout du scénario avec une valeur négative                                                      |                                                |
-| 8     | Relance des tests                                                                               | Les 3 scénarios réussis                        |
+| Étape | Action                                                                             | Résultat                                            |
+| ------ | ---------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| 1      | Rédaction du test unitaire                                                        |                                                      |
+| 2      | Lancement du test sans fonction                                                    | Échec                                               |
+| 3      | Scénario « liste de cibles vide » : création de la fonction à vide (`pass`) | Échec                                               |
+| 4      | Ajout d'un retour avec valeurs à zéro                                            | Réussite                                            |
+| 5      | Ajout d'un scénario avec des valeurs                                              | Premier scénario réussi, second scénario échoué |
+| 6      | Amélioration de la fonction : détection via `is_target_detectable`             | Les deux scénarios réussis                         |
+| 7      | Ajout du scénario avec une valeur négative                                       |                                                      |
+| 8      | Relance des tests                                                                  | Les 3 scénarios réussis                            |
+| 9      | ajout du scenariot avec des doublons                                        |                                                      |
+| 10     | Relance des tests                                                                  | Les 3 scénarios réussis                            |
+| 11     | rédaction de la fonction de test de non modification                                          |                                 |
+| 12     | Relance des tests                                                                  | tous les tests réussis                            |
+
