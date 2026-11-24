@@ -3,8 +3,7 @@ __pycache__/
 *.py[cod]
 
 # Environnements virtuels
-.venv/
-venv/
+*venv/
 env/
 
 # Tests et couverture

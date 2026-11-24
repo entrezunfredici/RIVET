@@ -54,9 +54,31 @@ def analyze_targets(target_distance_list : list[float]) -> dict[str, list[float]
 
 class Radar():
     def __init__(self, min_detection_distance : float = MIN_DETECTION_DISTANCE, max_detection_distance : float = MAX_DETECTION_DISTANCE):
+        for detection_distance in [min_detection_distance, max_detection_distance]:
+            if detection_distance is None or isinstance(detection_distance, bool) or not isinstance(detection_distance, (float, int)):
+                raise ValueError("Les distances de detection doivent être des flotants ou des entiers")
         if min_detection_distance<0 or max_detection_distance<0:
             raise ValueError("une distance de détection ne peut pas être négative")
         if min_detection_distance>=max_detection_distance: 
             raise ValueError("La distance de detection maximale doit être strictement superieur a celle de détection minimale")
         self.min_detection_distance = min_detection_distance
         self.max_detection_distance = max_detection_distance
+
+    def is_target_detectable(self, target_distance : float) -> bool:
+        """
+        Vérifie si une cible se trouve dans la portée du radar.
+
+        Args:
+            target_distance (float): Distance de la cible en mètres.
+
+        Returns:
+            bool: True si la cible est détectable, False sinon.
+
+        Raises:
+            ValueError: Si la distance est négative.
+        """
+
+        if target_distance<0:
+            raise ValueError("La distance ne peut pas être négative")
+
+        return self.min_detection_distance  <= target_distance <= self.max_detection_distance

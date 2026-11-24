@@ -80,8 +80,12 @@ def test_radar_class_with_value(min_detection_distance,max_detection_distance):
 
 test_radar_impossible_values_list = [
     (-5,200,"une distance de détection ne peut pas être négative"),
+    (10,-5,"une distance de détection ne peut pas être négative"),
     (100,100,"La distance de detection maximale doit être strictement superieur a celle de détection minimale"),
     (300,100,"La distance de detection maximale doit être strictement superieur a celle de détection minimale"),
+    ("5","100","Les distances de detection doivent être des flotants"),
+    (None,100,"Les distances de detection doivent être des flotants ou des entiers"),
+    (10,False,"Les distances de detection doivent être des flotants ou des entiers")
 ]
 
 @pytest.mark.parametrize("min_detection_distance, max_detection_distance, error", test_radar_impossible_values_list)
@@ -89,3 +93,11 @@ def test_radar_class_with_impossible_values(min_detection_distance,max_detection
     with pytest.raises(ValueError, match=error):
         Radar(min_detection_distance, max_detection_distance)
 
+@pytest.mark.parametrize("target_distance, response", test_distance_dict.items())
+def test_is_target_detectable_by_default_radar(target_distance, response):
+    test_radar = Radar()
+    if isinstance(response, str):
+        with pytest.raises(ValueError, match=response):
+            test_radar.is_target_detectable(target_distance)
+    else:
+        assert test_radar.is_target_detectable(target_distance)==response
