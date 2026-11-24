@@ -1,4 +1,5 @@
 from rivet.radar import is_target_detectable, analyze_targets
+from rivet import Radar
 import pytest
 
 test_distance_dict = {
@@ -58,3 +59,22 @@ def test_safe_list(target_distance_list):
     target_distance_copy_list=target_distance_list.copy()
     analyze_targets(target_distance_list)
     assert target_distance_list == target_distance_copy_list
+
+
+def test_radar_class_with_default_values():
+    test_radar = Radar()
+    assert test_radar.min_detection_distance == 1.0
+    assert test_radar.max_detection_distance == 200.0
+
+test_radar_list = [
+    (5,100),
+    (10,500),
+    (0.5,50),
+]
+
+@pytest.mark.parametrize("min_detection_distance, max_detection_distance", test_radar_list)
+def test_radar_class(min_detection_distance,max_detection_distance):
+    test_radar = Radar(min_detection_distance, max_detection_distance)
+    assert test_radar.min_detection_distance == min_detection_distance
+    assert test_radar.max_detection_distance == max_detection_distance
+
