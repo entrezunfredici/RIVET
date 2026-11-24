@@ -61,20 +61,31 @@ def test_safe_list(target_distance_list):
     assert target_distance_list == target_distance_copy_list
 
 
-def test_radar_class_with_default_values():
+def test_radar_class_without_values():
     test_radar = Radar()
     assert test_radar.min_detection_distance == 1.0
     assert test_radar.max_detection_distance == 200.0
 
-test_radar_list = [
+test_radar_values_list = [
     (5,100),
     (10,500),
     (0.5,50),
 ]
 
-@pytest.mark.parametrize("min_detection_distance, max_detection_distance", test_radar_list)
-def test_radar_class(min_detection_distance,max_detection_distance):
+@pytest.mark.parametrize("min_detection_distance, max_detection_distance", test_radar_values_list)
+def test_radar_class_with_value(min_detection_distance,max_detection_distance):
     test_radar = Radar(min_detection_distance, max_detection_distance)
     assert test_radar.min_detection_distance == min_detection_distance
     assert test_radar.max_detection_distance == max_detection_distance
+
+test_radar_impossible_values_list = [
+    (-5,200,"une distance de détection ne peut pas être négative"),
+    (100,100,"La distance de detection maximale doit être strictement superieur a celle de détection minimale"),
+    (300,100,"La distance de detection maximale doit être strictement superieur a celle de détection minimale"),
+]
+
+@pytest.mark.parametrize("min_detection_distance, max_detection_distance, error", test_radar_impossible_values_list)
+def test_radar_class_with_impossible_values(min_detection_distance,max_detection_distance, error):
+    with pytest.raises(ValueError, match=error):
+        Radar(min_detection_distance, max_detection_distance)
 

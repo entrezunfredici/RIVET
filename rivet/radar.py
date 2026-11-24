@@ -54,7 +54,9 @@ def analyze_targets(target_distance_list : list[float]) -> dict[str, list[float]
 
 class Radar():
     def __init__(self, min_detection_distance : float = MIN_DETECTION_DISTANCE, max_detection_distance : float = MAX_DETECTION_DISTANCE):
+        if min_detection_distance<0 or max_detection_distance<0:
+            raise ValueError("une distance de détection ne peut pas être négative")
+        if min_detection_distance>=max_detection_distance: 
+            raise ValueError("La distance de detection maximale doit être strictement superieur a celle de détection minimale")
         self.min_detection_distance = min_detection_distance
         self.max_detection_distance = max_detection_distance
-
-    
