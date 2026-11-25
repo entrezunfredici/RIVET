@@ -101,3 +101,73 @@ def test_is_target_detectable_by_default_radar(target_distance, response):
             test_radar.is_target_detectable(target_distance)
     else:
         assert test_radar.is_target_detectable(target_distance)==response
+
+test_pair_of_radar_list = (
+    (
+        {"min_detection_distance":10, "max_detection_distance":200}, 
+        {"min_detection_distance":50, "max_detection_distance":100},
+        70,
+    ),
+)
+
+@pytest.mark.parametrize("radar_1, radar_2, change_max_detection_distance", test_pair_of_radar_list)
+def test_is_radar_is_independant(radar_1, radar_2, change_max_detection_distance):
+    test_radar_1 = Radar(radar_1["min_detection_distance"],radar_1["max_detection_distance"])
+    test_radar_2 = Radar(radar_2["min_detection_distance"],radar_2["max_detection_distance"])
+    assert test_radar_1.max_detection_distance == radar_1["max_detection_distance"]
+    test_radar_1.max_detection_distance = change_max_detection_distance
+    assert test_radar_1.max_detection_distance == change_max_detection_distance
+    assert test_radar_2.max_detection_distance == radar_2["max_detection_distance"]
+
+
+test_multiple_radar_values_list = [
+    (5,100,{
+        -1:"La distance ne peut pas être négative",
+        0:False,
+        1:False,
+        5:True,
+        50:True,
+        100:True,
+        500:False,
+        0.5:False,
+        199.9:False,
+        200:False,
+        200.1:False
+    }),
+    (10,500,{
+        -1:"La distance ne peut pas être négative",
+        0:False,
+        1:False,
+        20:True,
+        50:True,
+        70:True,
+        500:True,
+        0.5:False,
+        199.9:True,
+        200:True,
+        200.1:True
+    }),
+    (0.5,50,{
+        -1:"La distance ne peut pas être négative",
+        0:False,
+        1:True,
+        20:True,
+        50:True,
+        70:False,
+        500:False,
+        0.5:True,
+        199.9:False,
+        200:False,
+        200.1:False
+    }),
+]
+
+@pytest.mark.parametrize("min_detection_distance, max_detection_distance, test_distance_dict", test_multiple_radar_values_list)
+def test_is_target_detectable_by_customs_radar(min_detection_distance, max_detection_distance, test_distance_dict):
+    test_radar = Radar(min_detection_distance, max_detection_distance)
+    for target_distance, response in test_distance_dict.items():
+        if isinstance(response, str):
+            with pytest.raises(ValueError, match=response):
+                test_radar.is_target_detectable(target_distance)
+        else:
+            assert test_radar.is_target_detectable(target_distance)==response
