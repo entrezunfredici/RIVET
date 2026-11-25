@@ -17,13 +17,13 @@ test_distance_dict = {
 }
 
 
-@pytest.mark.parametrize("target_distance, response", test_distance_dict.items())
-def test_is_target_detectable(target_distance, response):
+@pytest.mark.parametrize("target_distance_m, response", test_distance_dict.items())
+def test_is_target_detectable(target_distance_m, response):
     if isinstance(response, str):
         with pytest.raises(ValueError, match=response):
-            is_target_detectable(target_distance)
+            is_target_detectable(target_distance_m)
     else:
-        assert is_target_detectable(target_distance)==response
+        assert is_target_detectable(target_distance_m)==response
 
 test_targets_list = [
     ([],{
@@ -44,27 +44,27 @@ test_targets_list = [
     }),
 ]
 
-@pytest.mark.parametrize("target_distance_list, response", test_targets_list)
-def test_analyze_targets(target_distance_list, response):
+@pytest.mark.parametrize("target_distance_m_list, response", test_targets_list)
+def test_analyze_targets(target_distance_m_list, response):
     if isinstance(response, str):
         with pytest.raises(ValueError, match=response):
-            analyze_targets(target_distance_list)
+            analyze_targets(target_distance_m_list)
     else:
-        assert analyze_targets(target_distance_list) == response
+        assert analyze_targets(target_distance_m_list) == response
 
 test_targets_safe_list = [[0, 0.5, 0.5, 1, 1, 50, 50, 199.9, 200, 200.1]]
 
-@pytest.mark.parametrize("target_distance_list", test_targets_safe_list)
-def test_safe_list(target_distance_list):
-    target_distance_copy_list=target_distance_list.copy()
-    analyze_targets(target_distance_list)
-    assert target_distance_list == target_distance_copy_list
+@pytest.mark.parametrize("target_distance_m_list", test_targets_safe_list)
+def test_safe_list(target_distance_m_list):
+    target_distance_m_copy_list=target_distance_m_list.copy()
+    analyze_targets(target_distance_m_list)
+    assert target_distance_m_list == target_distance_m_copy_list
 
 
 def test_radar_class_without_values():
     test_radar = Radar()
-    assert test_radar.min_detection_distance == 1.0
-    assert test_radar.max_detection_distance == 200.0
+    assert test_radar.min_detection_distance_m == 1.0
+    assert test_radar.max_detection_distance_m == 200.0
 
 test_radar_values_list = [
     (5,100),
@@ -72,52 +72,53 @@ test_radar_values_list = [
     (0.5,50),
 ]
 
-@pytest.mark.parametrize("min_detection_distance, max_detection_distance", test_radar_values_list)
-def test_radar_class_with_value(min_detection_distance,max_detection_distance):
-    test_radar = Radar(min_detection_distance, max_detection_distance)
-    assert test_radar.min_detection_distance == min_detection_distance
-    assert test_radar.max_detection_distance == max_detection_distance
+@pytest.mark.parametrize("min_detection_distance_m, max_detection_distance_m", test_radar_values_list)
+def test_radar_class_with_value(min_detection_distance_m,max_detection_distance_m):
+    test_radar = Radar(min_detection_distance_m, max_detection_distance_m)
+    assert test_radar.min_detection_distance_m == min_detection_distance_m
+    assert test_radar.max_detection_distance_m == max_detection_distance_m
 
 test_radar_impossible_values_list = [
     (-5,200,"une distance de détection ne peut pas être négative"),
     (10,-5,"une distance de détection ne peut pas être négative"),
     (100,100,"La distance de detection maximale doit être strictement superieur a celle de détection minimale"),
     (300,100,"La distance de detection maximale doit être strictement superieur a celle de détection minimale"),
-    ("5","100","Les distances de detection doivent être des flotants"),
+    ("5","100","Les distances de detection doivent être des flotants ou des entiers"),
     (None,100,"Les distances de detection doivent être des flotants ou des entiers"),
-    (10,False,"Les distances de detection doivent être des flotants ou des entiers")
+    (10,False,"Les distances de detection doivent être des flotants ou des entiers"),
+    (10,{"name":"kévin","âge":25},"Les distances de detection doivent être des flotants ou des entiers")
 ]
 
-@pytest.mark.parametrize("min_detection_distance, max_detection_distance, error", test_radar_impossible_values_list)
-def test_radar_class_with_impossible_values(min_detection_distance,max_detection_distance, error):
+@pytest.mark.parametrize("min_detection_distance_m, max_detection_distance_m, error", test_radar_impossible_values_list)
+def test_radar_class_with_impossible_values(min_detection_distance_m,max_detection_distance_m, error):
     with pytest.raises(ValueError, match=error):
-        Radar(min_detection_distance, max_detection_distance)
+        Radar(min_detection_distance_m, max_detection_distance_m)
 
-@pytest.mark.parametrize("target_distance, response", test_distance_dict.items())
-def test_is_target_detectable_by_default_radar(target_distance, response):
+@pytest.mark.parametrize("target_distance_m, response", test_distance_dict.items())
+def test_is_target_detectable_by_default_radar(target_distance_m, response):
     test_radar = Radar()
     if isinstance(response, str):
         with pytest.raises(ValueError, match=response):
-            test_radar.is_target_detectable(target_distance)
+            test_radar.is_target_detectable(target_distance_m)
     else:
-        assert test_radar.is_target_detectable(target_distance)==response
+        assert test_radar.is_target_detectable(target_distance_m)==response
 
 test_pair_of_radar_list = (
     (
-        {"min_detection_distance":10, "max_detection_distance":200}, 
-        {"min_detection_distance":50, "max_detection_distance":100},
+        {"min_detection_distance_m":10, "max_detection_distance_m":200}, 
+        {"min_detection_distance_m":50, "max_detection_distance_m":100},
         70,
     ),
 )
 
-@pytest.mark.parametrize("radar_1, radar_2, change_max_detection_distance", test_pair_of_radar_list)
-def test_is_radar_is_independant(radar_1, radar_2, change_max_detection_distance):
-    test_radar_1 = Radar(radar_1["min_detection_distance"],radar_1["max_detection_distance"])
-    test_radar_2 = Radar(radar_2["min_detection_distance"],radar_2["max_detection_distance"])
-    assert test_radar_1.max_detection_distance == radar_1["max_detection_distance"]
-    test_radar_1.max_detection_distance = change_max_detection_distance
-    assert test_radar_1.max_detection_distance == change_max_detection_distance
-    assert test_radar_2.max_detection_distance == radar_2["max_detection_distance"]
+@pytest.mark.parametrize("radar_1, radar_2, change_max_detection_distance_m", test_pair_of_radar_list)
+def test_is_radar_is_independant(radar_1, radar_2, change_max_detection_distance_m):
+    test_radar_1 = Radar(radar_1["min_detection_distance_m"],radar_1["max_detection_distance_m"])
+    test_radar_2 = Radar(radar_2["min_detection_distance_m"],radar_2["max_detection_distance_m"])
+    assert test_radar_1.max_detection_distance_m == radar_1["max_detection_distance_m"]
+    test_radar_1.max_detection_distance_m = change_max_detection_distance_m
+    assert test_radar_1.max_detection_distance_m == change_max_detection_distance_m
+    assert test_radar_2.max_detection_distance_m == radar_2["max_detection_distance_m"]
 
 
 test_multiple_radar_values_list = [
@@ -162,12 +163,12 @@ test_multiple_radar_values_list = [
     }),
 ]
 
-@pytest.mark.parametrize("min_detection_distance, max_detection_distance, test_distance_dict", test_multiple_radar_values_list)
-def test_is_target_detectable_by_customs_radar(min_detection_distance, max_detection_distance, test_distance_dict):
-    test_radar = Radar(min_detection_distance, max_detection_distance)
-    for target_distance, response in test_distance_dict.items():
+@pytest.mark.parametrize("min_detection_distance_m, max_detection_distance_m, test_distance_dict", test_multiple_radar_values_list)
+def test_is_target_detectable_by_customs_radar(min_detection_distance_m, max_detection_distance_m, test_distance_dict):
+    test_radar = Radar(min_detection_distance_m, max_detection_distance_m)
+    for target_distance_m, response in test_distance_dict.items():
         if isinstance(response, str):
             with pytest.raises(ValueError, match=response):
-                test_radar.is_target_detectable(target_distance)
+                test_radar.is_target_detectable(target_distance_m)
         else:
-            assert test_radar.is_target_detectable(target_distance)==response
+            assert test_radar.is_target_detectable(target_distance_m)==response
