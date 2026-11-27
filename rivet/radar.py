@@ -1,25 +1,7 @@
+from .target import Target
+
 min_detection_distance_m  = 1
 max_detection_distance_m  = 200
-
-def is_target_detectable(target_distance_m : float) -> bool:
-    """
-    Vérifie si une cible se trouve dans la portée du radar.
-
-    Args:
-        target_distance_m (float): Distance de la cible en mètres.
-
-    Returns:
-        bool: True si la cible est détectable, False sinon.
-
-    Raises:
-        ValueError: Si la distance est négative.
-    """
-
-    if target_distance_m<0:
-        raise ValueError("La distance ne peut pas être négative")
-
-    return min_detection_distance_m  <= target_distance_m <= max_detection_distance_m 
-
 
 def analyze_targets(target_distance_m_list : list[float]) -> dict[str, list[float] | int]:
     """
@@ -40,8 +22,10 @@ def analyze_targets(target_distance_m_list : list[float]) -> dict[str, list[floa
     target_detected_list = []
     target_not_detected_list = []
 
+    radar = Radar()
+
     for target_distance_m in target_distance_m_list:
-        if is_target_detectable(target_distance_m):
+        if radar.is_target_detectable(target_distance_m):
             target_detected_list.append(target_distance_m)
         else:
             target_not_detected_list.append(target_distance_m)
@@ -82,3 +66,6 @@ class Radar():
             raise ValueError("La distance ne peut pas être négative")
 
         return self.min_detection_distance_m  <= target_distance_m <= self.max_detection_distance_m
+
+    def detect_target(self, target: Target)  -> bool :
+        return self.is_target_detectable(target.target_distance_m)

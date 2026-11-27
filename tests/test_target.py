@@ -9,11 +9,11 @@ test_targets_values_list = [
     ("T004",70.0,-10)
 ]
 
-@pytest.mark.parametrize("target_id, distance_m, radial_velocity_m_s", test_targets_values_list)
-def test_create_target_with_possible_values(target_id, distance_m, radial_velocity_m_s):
-    test_target = Target(target_id, distance_m, radial_velocity_m_s)
+@pytest.mark.parametrize("target_id, target_distance_m, radial_velocity_m_s", test_targets_values_list)
+def test_create_target_with_possible_values(target_id, target_distance_m, radial_velocity_m_s):
+    test_target = Target(target_id, target_distance_m, radial_velocity_m_s)
     assert test_target.target_id == target_id
-    assert test_target.distance_m == distance_m
+    assert test_target.target_distance_m == target_distance_m
     assert test_target.radial_velocity_m_s == radial_velocity_m_s
 
 test_targets_impossible_values = [
@@ -23,7 +23,17 @@ test_targets_impossible_values = [
     ("T004",70.0,{"radial velocity":-10}, "la vélocitée radiale doit être un flottant ou un int")
 ]
 
-@pytest.mark.parametrize("target_id, distance_m, radial_velocity_m_s, error", test_targets_impossible_values)
-def test_create_target_with_impossible_values(target_id, distance_m, radial_velocity_m_s, error):
+@pytest.mark.parametrize("target_id, target_distance_m, radial_velocity_m_s, error", test_targets_impossible_values)
+def test_create_target_with_impossible_values(target_id, target_distance_m, radial_velocity_m_s, error):
     with pytest.raises(ValueError, match=error):
-        Target(target_id, distance_m, radial_velocity_m_s)
+        Target(target_id, target_distance_m, radial_velocity_m_s)
+
+test_moving_target_list = [
+    ("T001",100.0,-10.0,3,70),
+]
+
+@pytest.mark.parametrize("target_id, target_distance_m, radial_velocity_m_s, duration_s, destination_m", test_moving_target_list)
+def test_moving_target(target_id, target_distance_m, radial_velocity_m_s, duration_s, destination_m):
+    moving_target = Target(target_id, target_distance_m, radial_velocity_m_s)
+    moving_target.advance_time(duration_s)
+    assert moving_target.target_distance_m == destination_m

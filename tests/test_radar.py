@@ -1,29 +1,6 @@
-from rivet.radar import is_target_detectable, analyze_targets
-from rivet import Radar
+from rivet.radar import analyze_targets
+from rivet import Radar, Target
 import pytest
-
-test_distance_dict = {
-    -1:"La distance ne peut pas être négative",
-    0:False,
-    1:True,
-    20:True,
-    50:True,
-    70:True,
-    500:False,
-    0.5:False,
-    199.9:True,
-    200:True,
-    200.1:False
-}
-
-
-@pytest.mark.parametrize("target_distance_m, response", test_distance_dict.items())
-def test_is_target_detectable(target_distance_m, response):
-    if isinstance(response, str):
-        with pytest.raises(ValueError, match=response):
-            is_target_detectable(target_distance_m)
-    else:
-        assert is_target_detectable(target_distance_m)==response
 
 test_targets_list = [
     ([],{
@@ -93,6 +70,20 @@ test_radar_impossible_values_list = [
 def test_radar_class_with_impossible_values(min_detection_distance_m,max_detection_distance_m, error):
     with pytest.raises(ValueError, match=error):
         Radar(min_detection_distance_m, max_detection_distance_m)
+
+test_distance_dict = {
+    -1:"La distance ne peut pas être négative",
+    0:False,
+    1:True,
+    20:True,
+    50:True,
+    70:True,
+    500:False,
+    0.5:False,
+    199.9:True,
+    200:True,
+    200.1:False
+}
 
 @pytest.mark.parametrize("target_distance_m, response", test_distance_dict.items())
 def test_is_target_detectable_by_default_radar(target_distance_m, response):
@@ -172,3 +163,89 @@ def test_is_target_detectable_by_customs_radar(min_detection_distance_m, max_det
                 test_radar.is_target_detectable(target_distance_m)
         else:
             assert test_radar.is_target_detectable(target_distance_m)==response
+
+test_target_detections_list = [
+    (
+        {
+            "min_detection_distance_m":10,
+            "max_detection_distance_m":200,
+        },{
+            "target_id": "T001",
+            "target_distance_m": 150,
+            "radial_velocity_m_s": 20,
+        },
+        True
+    ),
+    (
+        {
+            "min_detection_distance_m":10,
+            "max_detection_distance_m":200,
+        },{
+            "target_id": "T001",
+            "target_distance_m": 250,
+            "radial_velocity_m_s": 20,
+        },
+        False
+    ),
+    (
+        {
+            "min_detection_distance_m":10,
+            "max_detection_distance_m":200,
+        },{
+            "target_id": "T001",
+            "target_distance_m": 5,
+            "radial_velocity_m_s": 20,
+        },
+        False
+    ),
+    (
+        {
+            "min_detection_distance_m":10,
+            "max_detection_distance_m":200,
+        },{
+            "target_id": "T001",
+            "target_distance_m": 10,
+            "radial_velocity_m_s": 20,
+        },
+        True
+    ),
+    (
+        {
+            "min_detection_distance_m":10,
+            "max_detection_distance_m":200,
+        },{
+            "target_id": "T001",
+            "target_distance_m": 200,
+            "radial_velocity_m_s": 20,
+        },
+        True
+    ),
+    (
+        {
+            "min_detection_distance_m":50,
+            "max_detection_distance_m":100,
+        },{
+            "target_id": "T001",
+            "target_distance_m": 25,
+            "radial_velocity_m_s": 20,
+        },
+        False
+    ),
+    (
+        {
+            "min_detection_distance_m":50,
+            "max_detection_distance_m":100,
+        },{
+            "target_id": "T001",
+            "target_distance_m": 75,
+            "radial_velocity_m_s": 20,
+        },
+        True
+    ),
+]
+
+@pytest.mark.parametrize("radar, target, detection_response", test_target_detections_list)
+def test_target_detections(radar, target, detection_response):
+    test_radar = Radar(radar["min_detection_distance_m"], radar["max_detection_distance_m"])
+    test_target = Target(target["target_id"],target["target_distance_m"],target["radial_velocity_m_s"])
+    assert test_radar.detect_target(test_target) == detection_response
