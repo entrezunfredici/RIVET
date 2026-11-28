@@ -1,6 +1,7 @@
 from rivet.radar import analyze_targets
 from rivet import Radar, Target
 import pytest
+from unittest.mock import patch
 
 test_targets_list = [
     ([],{
@@ -249,3 +250,12 @@ def test_target_detections(radar, target, detection_response):
     test_radar = Radar(radar["min_detection_distance_m"], radar["max_detection_distance_m"])
     test_target = Target(target["target_id"],target["target_distance_m"],target["radial_velocity_m_s"])
     assert test_radar.detect_target(test_target) == detection_response
+
+@pytest.mark.parametrize("radar, target, detection_response", test_target_detections_list)
+def test_detect_target_calls_detection_method(radar, target, detection_response):
+    test_radar = Radar(radar["min_detection_distance_m"], radar["max_detection_distance_m"])
+    test_target = Target(target["target_id"],target["target_distance_m"],target["radial_velocity_m_s"])
+
+    with patch.object(test_radar, "is_target_detectable", return_value=detection_response) as mock_read:
+        assert test_radar.detect_target(test_target) == detection_response
+        mock_read.assert_called_once_with(test_target.target_distance_m)
