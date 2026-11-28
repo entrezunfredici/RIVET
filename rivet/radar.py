@@ -68,4 +68,13 @@ class Radar():
         return self.min_detection_distance_m  <= target_distance_m <= self.max_detection_distance_m
 
     def detect_target(self, target: Target)  -> bool :
+        """
+        Vérifie si une cible est détectable par le radar.
+
+        Args:
+            target (Target): Cible à detecter.
+
+        Returns:
+            bool: True si la cible est détectable, False sinon.
+        """
         return self.is_target_detectable(target.target_distance_m)

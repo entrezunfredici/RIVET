@@ -30,6 +30,10 @@ def test_create_target_with_impossible_values(target_id, target_distance_m, radi
 
 test_moving_target_list = [
     ("T001",100.0,-10.0,3,70),
+    ("T001",100.0,0,5,100),
+    ("T001",100.0,-10.0,0,100),
+    ("T001",20.0,-10.0,2,0),
+    ("T001",100.0,10.0,3,130),
 ]
 
 @pytest.mark.parametrize("target_id, target_distance_m, radial_velocity_m_s, duration_s, destination_m", test_moving_target_list)
@@ -37,3 +41,16 @@ def test_moving_target(target_id, target_distance_m, radial_velocity_m_s, durati
     moving_target = Target(target_id, target_distance_m, radial_velocity_m_s)
     moving_target.advance_time(duration_s)
     assert moving_target.target_distance_m == destination_m
+
+test_moving_target_fail_list = [
+    ("T001",100.0,-10.0,-3,"Une durée ne peut pas être négative"),
+    ("T001",20.0,-10.0,3,"La destination ne peut pas être négative"),
+    ("T001",100.0,-10.0,"3","Une durée doit être exprimée en entier ou en flotant"),
+]
+
+@pytest.mark.parametrize("target_id, target_distance_m, radial_velocity_m_s, duration_s, error", test_moving_target_fail_list)
+def test_fail_moving_target(target_id, target_distance_m, radial_velocity_m_s, duration_s, error):
+    moving_target = Target(target_id, target_distance_m, radial_velocity_m_s)
+    with pytest.raises(ValueError, match=error):
+        moving_target.advance_time(duration_s)
+    assert moving_target.target_distance_m == target_distance_m
